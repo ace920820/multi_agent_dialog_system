@@ -17,7 +17,7 @@ class ConsultationAgent(BaseAgent):
     负责提供健康问题解答、就医建议、用药指导和检查解读
     """
     
-    def __init__(self, name: str, role: str, actions: List[BaseAction],llm):
+    def __init__(self, name: str, role: str, actions: List[BaseAction]):
         """
         初始化医疗咨询智能体
         
@@ -26,7 +26,7 @@ class ConsultationAgent(BaseAgent):
             role: 智能体角色描述
             actions: 智能体可执行的动作列表
         """
-        super().__init__(name=name, role=role, actions=actions, llm=llm)
+        super().__init__(name=name, role=role, actions=actions)
         # 初始化咨询主题
         self.consultation_topic = None
         # 初始化咨询上下文

@@ -14,10 +14,12 @@ import os
 
 # 导入智能体组件
 from agentlite.agents import BaseAgent
+from agentlite.llm.agent_llms import OpenAIChatLLM
 from agents.manager_agent import MedicalManagerAgent
 from agents.appointment_agent import AppointmentAgent
 from agents.guide_agent import GuideAgent
 from agents.consultation_agent import ConsultationAgent
+from agentlite.llm.LLMConfig import LLMConfig
 
 # 导入数据模型
 from models.user import UserModel
@@ -77,12 +79,15 @@ def init_system():
         
         appointment_model = AppointmentModel()
         logger.info("预约模型初始化完成")
-        
+        llm_config = LLMConfig({})
+        llm = OpenAIChatLLM(llm_config)
+        logger.info("LLM初始化完成")
         # 创建预约挂号智能体
         appointment_agent = AppointmentAgent(
             name="预约挂号智能体",
             role="负责收集用户信息、分析症状、推荐科室和医生，并管理预约",
-            actions=[]
+            actions=[],
+            llm=llm
         )
         logger.info("预约挂号智能体初始化完成")
         
@@ -90,7 +95,8 @@ def init_system():
         guide_agent = GuideAgent(
             name="导诊推荐智能体",
             role="负责症状采集、分析和科室匹配",
-            actions=[]
+            actions=[],
+            llm=llm
         )
         logger.info("导诊推荐智能体初始化完成")
         
@@ -98,7 +104,8 @@ def init_system():
         consultation_agent = ConsultationAgent(
             name="医疗咨询智能体",
             role="提供健康问题解答、就医建议、用药指导和检查解读",
-            actions=[]
+            actions=[],
+            llm=llm
         )
         logger.info("医疗咨询智能体初始化完成")
         
@@ -107,7 +114,8 @@ def init_system():
         manager_agent = MedicalManagerAgent(
             name="管理智能体",
             role="管理整个服务流程，分解任务并分配给个体智能体",
-            team_agents=team
+            team_agents=team,
+            llm=llm
         )
         logger.info("管理智能体初始化完成")
         

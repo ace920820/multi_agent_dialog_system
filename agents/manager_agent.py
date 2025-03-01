@@ -17,7 +17,7 @@ class MedicalManagerAgent(ManagerAgent):
     并整合各个智能体的处理结果，生成最终响应。
     """
     
-    def __init__(self, name: str, role: str, team_agents: List):
+    def __init__(self, name: str, role: str, team_agents: List, llm):
         """
         初始化医疗服务管理智能体
         
@@ -26,7 +26,7 @@ class MedicalManagerAgent(ManagerAgent):
             role: 智能体角色描述
             team_agents: 团队中的个体智能体列表
         """
-        super().__init__(name=name, role=role, TeamAgents=team_agents)
+        super().__init__(name=name, role=role, TeamAgents=team_agents, llm=llm)
         logger.info(f"医疗管理智能体 {name} 已初始化，管理 {len(team_agents)} 个智能体")
     
     def decompose_task(self, instruction: str) -> List[Dict[str, Any]]:

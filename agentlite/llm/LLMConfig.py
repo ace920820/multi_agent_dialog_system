@@ -13,6 +13,6 @@ class LLMConfig:
         self.max_tokens = 256
         self.end_of_prompt = ""
         self.api_key: str = os.environ.get("OPENAI_API_KEY", "EMPTY")
-        self.base_url = None
+        self.base_url = os.environ.get("OPENAI_BASE_URL", None)
         self.provider = None
         self.__dict__.update(config_dict)

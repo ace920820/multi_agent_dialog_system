@@ -17,7 +17,7 @@ class GuideAgent(BaseAgent):
     负责采集症状信息，管理病史记录，进行智能科室匹配和医生专长匹配
     """
     
-    def __init__(self, name: str, role: str, actions: List[BaseAction]):
+    def __init__(self, name: str, role: str, actions: List[BaseAction], llm):
         """
         初始化导诊推荐智能体
         
@@ -26,7 +26,7 @@ class GuideAgent(BaseAgent):
             role: 智能体角色描述
             actions: 智能体可执行的动作列表
         """
-        super().__init__(name=name, role=role, actions=actions)
+        super().__init__(name=name, role=role, actions=actions, llm=llm)
         # 初始化症状信息存储
         self.symptom_info = {}
         # 初始化病史记录

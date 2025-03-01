@@ -17,7 +17,7 @@ class AppointmentAgent(BaseAgent):
     负责收集用户基本信息，了解就医需求，推荐合适科室和医生，并管理预约时间段
     """
     
-    def __init__(self, name: str, role: str, actions: List[BaseAction]):
+    def __init__(self, name: str, role: str, actions: List[BaseAction], llm):
         """
         初始化预约挂号智能体
         
@@ -26,7 +26,7 @@ class AppointmentAgent(BaseAgent):
             role: 智能体角色描述
             actions: 智能体可执行的动作列表
         """
-        super().__init__(name=name, role=role, actions=actions)
+        super().__init__(name=name, role=role, actions=actions, llm=llm)
         # 初始化用户信息存储
         self.user_info = {}
         # 初始化预约状态
