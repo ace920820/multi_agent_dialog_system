@@ -44,7 +44,7 @@ class ManagerAgent(BaseAgent):
         :type instruction: str, optional
         :param reasoning_type: the reasoning type of this agent, defaults to "react"
         :type reasoning_type: str, optional
-        :param TeamAgents: adding a list of agents to this manager agent, defaults to []
+        :param TeamAgents: adding a list of dialog_agents to this manager agent, defaults to []
         :type TeamAgents: List[ABCAgent], optional
         :param logger: the logger for this agent, defaults to DefaultLogger
         :type logger: AgentLogger, optional

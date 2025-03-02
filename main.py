@@ -15,10 +15,10 @@ import os
 # 导入智能体组件
 from agentlite.agents import BaseAgent
 from agentlite.llm.agent_llms import OpenAIChatLLM
-from agents.manager_agent import MedicalManagerAgent
-from agents.appointment_agent import AppointmentAgent
-from agents.guide_agent import GuideAgent
-from agents.consultation_agent import ConsultationAgent
+from dialog_agents.medical_manager_agent import MedicalManagerAgent
+from dialog_agents.appointment_agent import AppointmentAgent
+from dialog_agents.guide_agent import GuideAgent
+from dialog_agents.consultation_agent import ConsultationAgent
 from agentlite.llm.LLMConfig import LLMConfig
 
 # 导入数据模型

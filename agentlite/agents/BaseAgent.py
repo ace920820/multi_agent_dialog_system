@@ -154,7 +154,7 @@ class BaseAgent(ABCAgent):
         self.logger.end_execute(task=task, agent_name=self.name)
 
     def respond(self, task: TaskPackage, **kwargs) -> str:
-        """generate messages for manager agents
+        """generate messages for manager dialog_agents
 
         :param task: the task which agent receives and solves
         :type task: TaskPackage

@@ -1,4 +1,4 @@
-"""functions or objects shared by agents"""
+"""functions or objects shared by dialog_agents"""
 
 import re
 import json
