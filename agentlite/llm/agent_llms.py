@@ -38,7 +38,7 @@ class BaseLLM:
 class OpenAIChatLLM(BaseLLM):
     def __init__(self, llm_config: LLMConfig):
         super().__init__(llm_config=llm_config)
-        self.client = OpenAI(api_key=llm_config.api_key)
+        self.client = OpenAI(api_key=llm_config.api_key,base_url = llm_config.base_url)
 
     def run(self, prompt: str):
         response = self.client.chat.completions.create(

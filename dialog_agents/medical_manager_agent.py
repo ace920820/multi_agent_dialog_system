@@ -135,6 +135,54 @@ class MedicalManagerAgent(ManagerAgent):
             
         return final_response
         
+    def generate_prompt(self, task_package: Dict[str, Any]) -> str:
+        """
+        根据任务包生成提示词
+        
+        Args:
+            task_package: 任务包，包含任务指令和相关信息
+            
+        Returns:
+            生成的提示词
+        """
+        logger.info(f"为管理智能体任务生成提示词")
+        
+        instruction = task_package.get("instruction", "")
+        user_id = task_package.get("user_id", "unknown")
+        
+        # 获取会话历史
+        session = task_package.get("session", {})
+        history = session.get("history", [])
+        
+        # 构建历史对话文本
+        history_text = ""
+        if history:
+            for i, msg in enumerate(history[-5:]):  # 只使用最近5条消息
+                role = "用户" if msg["role"] == "user" else "系统"
+                history_text += f"{role}: {msg['content']}\n"
+        
+        # 构建提示词
+        prompt = f"""
+        你是一个医疗服务管理智能体，负责协调多个专业智能体为用户提供医疗服务。
+        
+        用户ID: {user_id}
+        用户当前请求: {instruction}
+        
+        最近的对话历史:
+        {history_text}
+        
+        请分析用户请求，并决定需要调用哪些专业智能体来处理。可选的智能体包括:
+        1. 预约挂号智能体 - 处理挂号、预约相关请求
+        2. 导诊推荐智能体 - 处理症状分析、科室推荐相关请求
+        3. 医疗咨询智能体 - 处理健康咨询、医疗建议相关请求
+        
+        请返回一个动作指令，说明你将如何处理这个请求，以及需要调用哪些智能体。
+        格式: "Action: [动作描述]"
+        """
+        
+        logger.info("提示词生成完成")
+        return prompt
+        
     def assign_tasks(self, instruction: str) -> str:
         """
         分配任务给团队中的智能体并获取结果
@@ -164,14 +212,28 @@ class MedicalManagerAgent(ManagerAgent):
             if executor:
                 # 调用个体智能体执行任务
                 logger.info(f"分配任务给 {executor_name}")
-                prompt = executor.generate_prompt(task_package)
-                action = executor.llm(prompt)
-                result = executor.run_action(action)
-                
-                # 更新任务包
-                task_package["answer"] = result
-                task_package["completion"] = "Completed"
-                logger.info(f"智能体 {executor_name} 已完成任务")
+                try:
+                    # 检查executor是否有generate_prompt方法
+                    if hasattr(executor, 'generate_prompt'):
+                        prompt = executor.generate_prompt(task_package)
+                        action = executor.llm(prompt)
+                        result = executor.run_action(action)
+                    else:
+                        # 如果没有generate_prompt方法，使用任务指令作为提示
+                        logger.warning(f"智能体 {executor_name} 没有generate_prompt方法，使用默认处理")
+                        action = executor.llm(task_package["instruction"])
+                        result = executor.run_action(action)
+                    
+                    # 更新任务包
+                    task_package["answer"] = result
+                    task_package["completion"] = "Completed"
+                    logger.info(f"智能体 {executor_name} 已完成任务")
+                except Exception as e:
+                    # 捕获执行过程中的异常
+                    error_msg = f"执行任务时出错: {str(e)}"
+                    logger.error(error_msg)
+                    task_package["answer"] = f"执行错误: {error_msg}"
+                    task_package["completion"] = "Failed"
             else:
                 logger.error(f"找不到执行者: {executor_name}")
                 

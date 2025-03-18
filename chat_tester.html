@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医疗助手系统 - 聊天API测试工具</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        /* 页面标题样式 */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+        
+        /* 表单区域样式 */
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        /* 输入字段样式 */
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        /* 响应区域样式 */
+        .response-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .response-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        #responseArea {
+            white-space: pre-wrap;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+        
+        /* 状态指示器样式 */
+        .status {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* 响应式布局 */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .form-container, .response-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面标题区域 -->
+    <div class="header">
+        <h1>医疗助手系统 - 聊天API测试工具</h1>
+        <p>通过此界面测试系统的聊天API功能</p>
+    </div>
+    
+    <!-- 表单区域 -->
+    <div class="form-container">
+        <div class="input-group">
+            <label for="userId">用户ID:</label>
+            <input type="text" id="userId" placeholder="请输入用户ID，默认为test_user" value="test_user">
+        </div>
+        
+        <div class="input-group">
+            <label for="userMessage">用户消息:</label>
+            <textarea id="userMessage" rows="5" placeholder="请输入您想发送的消息"></textarea>
+        </div>
+        
+        <button id="sendBtn" onclick="sendMessage()">发送消息</button>
+        <div class="status" id="status"></div>
+    </div>
+    
+    <!-- 响应区域 -->
+    <div class="response-container">
+        <div class="response-header">
+            <h2>系统响应</h2>
+        </div>
+        <pre id="responseArea">等待响应...</pre>
+    </div>
+    
+    <!-- JavaScript代码 -->
+    <script>
+        // 发送消息并获取响应
+        function sendMessage() {
+            // 获取用户输入
+            const userId = document.getElementById('userId').value.trim() || 'test_user';
+            const message = document.getElementById('userMessage').value.trim();
+            
+            // 输入验证
+            if (!message) {
+                alert('请输入消息内容！');
+                return;
+            }
+            
+            // 更新状态
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = '正在发送请求...';
+            
+            // 设置响应区域状态
+            const responseArea = document.getElementById('responseArea');
+            responseArea.textContent = '正在等待响应...';
+            
+            // 准备请求数据
+            const payload = {
+                user_id: userId,
+                message: message
+            };
+            
+            // 添加调试信息
+            console.log('发送请求到:', 'http://127.0.0.1:5000/api/chat');
+            console.log('请求数据:', payload);
+            
+            // 发送API请求
+            fetch('http://127.0.0.1:5000/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                mode: 'cors',  // 明确指定跨域模式
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                // 检查HTTP状态
+                console.log('收到响应状态:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP错误! 状态: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 处理成功响应
+                console.log('API响应:', data);
+                statusEl.textContent = '请求成功完成';
+                
+                // 显示响应内容
+                if (data.response) {
+                    responseArea.textContent = data.response;
+                } else {
+                    responseArea.textContent = JSON.stringify(data, null, 2);
+                }
+            })
+            .catch(error => {
+                // 处理错误
+                console.error('请求失败:', error);
+                statusEl.textContent = `请求失败: ${error.message}`;
+                responseArea.textContent = `错误: ${error.message}\n\n可能的原因:\n1. API服务器未运行或地址不正确(http://127.0.0.1:5000)\n2. 缺少CORS支持(安装flask-cors库)\n3. 网络连接问题\n4. 服务器内部错误\n\n请尝试:\n1. 确认服务器已启动\n2. 运行install_dependencies.bat安装依赖\n3. 重启服务器`;
+            });
+        }
+        
+        // 允许通过按Enter键发送消息
+        document.getElementById('userMessage').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

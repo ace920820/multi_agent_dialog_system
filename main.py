@@ -11,6 +11,7 @@ import json
 import logging
 from datetime import datetime
 import os
+from flask_cors import CORS  # 导入CORS模块
 
 # 导入智能体组件
 from agentlite.agents import BaseAgent
@@ -43,6 +44,7 @@ logger = logging.getLogger("医疗助手系统")
 
 # 初始化Flask应用
 app = Flask(__name__)
+CORS(app)  # 启用CORS支持，允许所有域的跨域请求
 
 # 全局变量
 manager_agent = None

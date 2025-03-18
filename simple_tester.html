@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医疗助手系统 - 简易测试工具</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        /* 容器样式 */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 标题样式 */
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        /* 按钮样式 */
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        /* 响应区域样式 */
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .response h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        #responseText {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        /* 状态信息样式 */
+        #status {
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>医疗助手系统 - 简易测试工具</h1>
+        
+        <!-- 测试表单 -->
+        <div class="form-group">
+            <label for="userId">用户ID:</label>
+            <input type="text" id="userId" value="test_user">
+        </div>
+        
+        <div class="form-group">
+            <label for="message">消息内容:</label>
+            <textarea id="message" placeholder="请输入您想发送的消息"></textarea>
+        </div>
+        
+        <button onclick="sendRequest()">发送请求</button>
+        
+        <div id="status"></div>
+        
+        <!-- 响应区域 -->
+        <div class="response">
+            <h2>系统响应</h2>
+            <div id="responseText">等待发送请求...</div>
+        </div>
+    </div>
+    
+    <script>
+        // 发送API请求
+        function sendRequest() {
+            // 获取输入值
+            const userId = document.getElementById('userId').value.trim() || 'test_user';
+            const message = document.getElementById('message').value.trim();
+            
+            // 验证输入
+            if (!message) {
+                alert('请输入消息内容！');
+                return;
+            }
+            
+            // 更新状态
+            document.getElementById('status').textContent = '正在发送请求...';
+            document.getElementById('responseText').textContent = '请求中...';
+            
+            // 准备请求数据
+            const data = {
+                user_id: userId,
+                message: message
+            };
+            
+            // 记录请求信息到控制台（调试用）
+            console.log('发送请求到 http://127.0.0.1:5000/api/chat');
+            console.log('请求数据:', data);
+            
+            // 发送请求
+            fetch('http://127.0.0.1:5000/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                // 记录状态（调试用）
+                console.log('响应状态:', response.status);
+                
+                // 检查响应状态
+                if (!response.ok) {
+                    throw new Error('服务器返回错误状态: ' + response.status);
+                }
+                
+                return response.json();
+            })
+            .then(data => {
+                // 处理成功响应
+                console.log('响应数据:', data);
+                document.getElementById('status').textContent = '请求成功';
+                
+                // 显示响应内容
+                if (data.response) {
+                    document.getElementById('responseText').textContent = data.response;
+                } else {
+                    document.getElementById('responseText').textContent = JSON.stringify(data, null, 2);
+                }
+            })
+            .catch(error => {
+                // 处理错误
+                console.error('请求失败:', error);
+                document.getElementById('status').textContent = '请求失败: ' + error.message;
+                document.getElementById('responseText').textContent = '错误: ' + error.message;
+            });
+        }
+    </script>
+</body>
+</html>
